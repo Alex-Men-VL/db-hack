@@ -1,9 +1,8 @@
 import random
 
+from datacenter.models import (Chastisement, Commendation, Lesson, Mark,
+                               Schoolkid)
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-
-from datacenter.models import Commendation, Chastisement, Mark, Schoolkid, \
-    Lesson
 
 
 class MyAppException(Exception):
