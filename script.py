@@ -6,13 +6,18 @@ from datacenter.models import Commendation, Chastisement, Mark, Schoolkid, \
     Lesson
 
 
+class MyAppException(Exception):
+    pass
+
+
 def check_child(schoolkid):
     try:
         children = Schoolkid.objects.get(full_name__contains=schoolkid)
     except MultipleObjectsReturned:
-        exit('Найдено сразу несколько учеников с введенным именем.')
+        raise MyAppException('Ошибка: Найдено сразу несколько учеников с '
+                             'введенным именем.')
     except ObjectDoesNotExist:
-        exit('Введено несуществующее имя.')
+        raise MyAppException('Ошибка: Введено несуществующее имя.')
     else:
         return children
 
@@ -24,7 +29,7 @@ def check_lesson(schoolkid, lesson):
     if lesson.title() in lessons_names:
         return lesson.title()
     else:
-        exit('Введенный урок не найден.')
+        raise MyAppException('Ошибка: Введенный урок не найден.')
 
 
 def fix_bad_marks(schoolkid):
