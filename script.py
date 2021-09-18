@@ -64,16 +64,14 @@ def create_commendation(schoolkid, lesson):
                                  teacher=child_lesson.teacher)
 
 
-def main():
-    schoolkid = check_child(input('Введите имя ученика: '))
-    lesson = check_lesson(schoolkid, input('Введите название предмета, '
-                                           'для которого хотите получить '
-                                           'похвалу: '))
+def fix_diary(child_name, lesson_name):
+    try:
+        schoolkid = check_child(child_name)
+        lesson = check_lesson(schoolkid, lesson_name)
+    except MyAppException as error:
+        print(error)
+        return
 
     fix_bad_marks(schoolkid)
     remove_chastisements(schoolkid)
     create_commendation(schoolkid, lesson)
-
-
-if __name__ == '__main__':
-    main()
