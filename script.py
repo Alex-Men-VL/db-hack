@@ -24,7 +24,7 @@ def check_child(schoolkid):
 
 def check_lesson(schoolkid, lesson):
     lessons = Lesson.objects.filter(year_of_study=schoolkid.year_of_study,
-                                        group_letter=schoolkid.group_letter)
+                                    group_letter=schoolkid.group_letter)
     lessons_names = set([lesson.subject.title for lesson in lessons])
     if lesson.title() in lessons_names:
         return lesson.title()
@@ -47,9 +47,11 @@ def remove_chastisements(schoolkid):
 
 
 def create_commendation(schoolkid, lesson):
-    child_lessons = Lesson.objects.filter(year_of_study=schoolkid.year_of_study,
-                                          group_letter=schoolkid.group_letter,
-                                          subject__title=lesson)
+    child_lessons = Lesson.objects.filter(
+        year_of_study=schoolkid.year_of_study,
+        group_letter=schoolkid.group_letter,
+        subject__title=lesson
+    )
     lessons_count = child_lessons.count()
     child_lesson = child_lessons[lessons_count - 1]
 
