@@ -59,8 +59,8 @@ def create_commendation(schoolkid, lesson):
 
     with open('commendations.txt') as file:
         commendations = file.readlines()
-        commendation = random.choice(commendations)
-        commendation_text = ' '.join(commendation.split()[1:])
+    commendation = random.choice(commendations)
+    commendation_text = ' '.join(commendation.split()[1:])
 
     teacher_commendations.create(text=commendation_text,
                                  created=child_lesson.date,
