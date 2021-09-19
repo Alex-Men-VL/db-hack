@@ -2,7 +2,8 @@ import random
 
 from datacenter.models import (Chastisement, Commendation, Lesson, Mark,
                                Schoolkid)
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+# from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+# from django.db.models import Model
 
 
 class DBException(Exception):
@@ -12,10 +13,10 @@ class DBException(Exception):
 def check_child(schoolkid):
     try:
         children = Schoolkid.objects.get(full_name__contains=schoolkid)
-    except MultipleObjectsReturned:
+    except Schoolkid.MultipleObjectsReturned:
         raise DBException('Ошибка: Найдено сразу несколько учеников с '
                           'введенным именем.')
-    except ObjectDoesNotExist:
+    except Schoolkid.DoesNotExist:
         raise DBException('Ошибка: Введено несуществующее имя.')
     else:
         return children
