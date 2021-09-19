@@ -8,31 +8,35 @@ class DBException(Exception):
     pass
 
 
-def check_child(schoolkid):
+def get_schoolkid_account(schoolkid):
     try:
         child = Schoolkid.objects.get(full_name__contains=schoolkid)
     except Schoolkid.MultipleObjectsReturned:
         raise DBException('Ошибка: Найдено сразу несколько учеников с '
-                          'введенным именем. Уточните имя ученика, добавив '
-                          'фамилию или отчество.')
+                          'введенным именем. \nРешение: Уточните имя ученика, '
+                          'добавив фамилию или отчество.')
     except Schoolkid.DoesNotExist:
-        raise DBException('Ошибка: Введено несуществующее имя. Проверьте '
-                          'правильность написания имени.')
+        raise DBException('Ошибка: Введено несуществующее имя. \nРешение: '
+                          'Проверьте правильность написания имени и порядок. '
+                          'Сначала идет фамилия, потом имя, затем отчество.')
     else:
         return child
 
 
-def check_lesson(schoolkid, lesson_name):
-    lessons = Lesson.objects.filter(year_of_study=schoolkid.year_of_study,
-                                    group_letter=schoolkid.group_letter)
-    lessons_names = set([lesson.subject.title for lesson in lessons])
-    if lesson_name in lessons_names:
-        return lesson_name
-    else:
-        raise DBException('Ошибка: Введенный урок не найден. Проверьте '
-                          'правильность написания названия урока. Название '
-                          'должно быть таким, как на сайте электронного '
-                          'дневника.')
+def get_schoolkid_lesson(schoolkid, lesson_name):
+    schoolkid_lessons = Lesson.objects.filter(
+        year_of_study=schoolkid.year_of_study,
+        group_letter=schoolkid.group_letter,
+        subject__title=lesson_name
+    )
+    lessons_count = schoolkid_lessons.count()
+    if lessons_count == 0:
+        raise DBException('Ошибка: Введенный урок не найден. \nРешение: '
+                          'Проверьте правильность написания названия урока. '
+                          'Название должно быть таким, как на сайте '
+                          'электронного дневника.')
+    schoolkid_lesson = schoolkid_lessons[lessons_count - 1]
+    return schoolkid_lesson
 
 
 def fix_bad_marks(schoolkid):
@@ -50,33 +54,26 @@ def remove_chastisements(schoolkid):
 
 
 def create_commendation(schoolkid, lesson):
-    child_lessons = Lesson.objects.filter(
-        year_of_study=schoolkid.year_of_study,
-        group_letter=schoolkid.group_letter,
-        subject__title=lesson
-    )
-    lessons_count = child_lessons.count()
-    child_lesson = child_lessons[lessons_count - 1]
-
     teacher_commendations = Commendation.objects.filter(
-        teacher__full_name=child_lesson.teacher.full_name,
-        subject__title=lesson)
+        teacher__full_name=lesson.teacher.full_name,
+        subject__title=lesson.subject.title
+    )
 
     with open('commendations.txt') as file:
         commendations = file.readlines()
     commendation = random.choice(commendations)
 
     teacher_commendations.create(text=commendation,
-                                 created=child_lesson.date,
+                                 created=lesson.date,
                                  schoolkid=schoolkid,
-                                 subject=child_lesson.subject,
-                                 teacher=child_lesson.teacher)
+                                 subject=lesson.subject,
+                                 teacher=lesson.teacher)
 
 
 def fix_diary(child_name, lesson_name):
     try:
-        schoolkid = check_child(child_name)
-        lesson = check_lesson(schoolkid, lesson_name)
+        schoolkid = get_schoolkid_account(child_name)
+        lesson = get_schoolkid_lesson(schoolkid, lesson_name)
     except DBException as error:
         print(error)
         return
