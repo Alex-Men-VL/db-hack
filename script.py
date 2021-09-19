@@ -4,7 +4,7 @@ from datacenter.models import (Chastisement, Commendation, Lesson, Mark,
                                Schoolkid)
 
 
-class DBException(Exception):
+class BDException(Exception):
     pass
 
 
@@ -12,11 +12,11 @@ def get_schoolkid_account(schoolkid):
     try:
         child = Schoolkid.objects.get(full_name__contains=schoolkid)
     except Schoolkid.MultipleObjectsReturned:
-        raise DBException('Ошибка: Найдено сразу несколько учеников с '
+        raise BDException('Ошибка: Найдено сразу несколько учеников с '
                           'введенным именем. \nРешение: Уточните имя ученика, '
                           'добавив фамилию или отчество.')
     except Schoolkid.DoesNotExist:
-        raise DBException('Ошибка: Введено несуществующее имя. \nРешение: '
+        raise BDException('Ошибка: Введено несуществующее имя. \nРешение: '
                           'Проверьте правильность написания имени и порядок. '
                           'Сначала идет фамилия, потом имя, затем отчество.')
     else:
@@ -31,7 +31,7 @@ def get_schoolkid_lesson(schoolkid, lesson_name):
     )
     lessons_count = schoolkid_lessons.count()
     if lessons_count == 0:
-        raise DBException('Ошибка: Введенный урок не найден. \nРешение: '
+        raise BDException('Ошибка: Введенный урок не найден. \nРешение: '
                           'Проверьте правильность написания названия урока. '
                           'Название должно быть таким, как на сайте '
                           'электронного дневника.')
@@ -74,7 +74,7 @@ def fix_diary(child_name, lesson_name):
     try:
         schoolkid = get_schoolkid_account(child_name)
         lesson = get_schoolkid_lesson(schoolkid, lesson_name)
-    except DBException as error:
+    except BDException as error:
         print(error)
         return
 
