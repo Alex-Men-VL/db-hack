@@ -2,8 +2,6 @@ import random
 
 from datacenter.models import (Chastisement, Commendation, Lesson, Mark,
                                Schoolkid)
-# from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-# from django.db.models import Model
 
 
 class DBException(Exception):
@@ -15,21 +13,26 @@ def check_child(schoolkid):
         child = Schoolkid.objects.get(full_name__contains=schoolkid)
     except Schoolkid.MultipleObjectsReturned:
         raise DBException('Ошибка: Найдено сразу несколько учеников с '
-                          'введенным именем.')
+                          'введенным именем. Уточните имя ученика, добавив '
+                          'фамилию или отчество.')
     except Schoolkid.DoesNotExist:
-        raise DBException('Ошибка: Введено несуществующее имя.')
+        raise DBException('Ошибка: Введено несуществующее имя. Проверьте '
+                          'правильность написания имени.')
     else:
         return child
 
 
-def check_lesson(schoolkid, lesson):
+def check_lesson(schoolkid, lesson_name):
     lessons = Lesson.objects.filter(year_of_study=schoolkid.year_of_study,
                                     group_letter=schoolkid.group_letter)
     lessons_names = set([lesson.subject.title for lesson in lessons])
-    if lesson.title() in lessons_names:
-        return lesson.title()
+    if lesson_name in lessons_names:
+        return lesson_name
     else:
-        raise DBException('Ошибка: Введенный урок не найден.')
+        raise DBException('Ошибка: Введенный урок не найден. Проверьте '
+                          'правильность написания названия урока. Название '
+                          'должно быть таким, как на сайте электронного '
+                          'дневника.')
 
 
 def fix_bad_marks(schoolkid):
