@@ -24,18 +24,16 @@ def get_schoolkid_account(schoolkid):
 
 
 def get_schoolkid_lesson(schoolkid, lesson_name):
-    schoolkid_lessons = Lesson.objects.filter(
+    schoolkid_lesson = Lesson.objects.filter(
         year_of_study=schoolkid.year_of_study,
         group_letter=schoolkid.group_letter,
         subject__title=lesson_name
-    )
-    lessons_count = schoolkid_lessons.count()
-    if lessons_count == 0:
+    ).last
+    if not schoolkid_lesson:
         raise BDException('Ошибка: Введенный урок не найден. \nРешение: '
                           'Проверьте правильность написания названия урока. '
                           'Название должно быть таким, как на сайте '
                           'электронного дневника.')
-    schoolkid_lesson = schoolkid_lessons[lessons_count - 1]
     return schoolkid_lesson
 
 
