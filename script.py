@@ -12,14 +12,14 @@ class DBException(Exception):
 
 def check_child(schoolkid):
     try:
-        children = Schoolkid.objects.get(full_name__contains=schoolkid)
+        child = Schoolkid.objects.get(full_name__contains=schoolkid)
     except Schoolkid.MultipleObjectsReturned:
         raise DBException('Ошибка: Найдено сразу несколько учеников с '
                           'введенным именем.')
     except Schoolkid.DoesNotExist:
         raise DBException('Ошибка: Введено несуществующее имя.')
     else:
-        return children
+        return child
 
 
 def check_lesson(schoolkid, lesson):
