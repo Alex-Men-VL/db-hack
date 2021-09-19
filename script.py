@@ -5,7 +5,7 @@ from datacenter.models import (Chastisement, Commendation, Lesson, Mark,
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
 
-class MyAppException(Exception):
+class DBException(Exception):
     pass
 
 
@@ -13,10 +13,10 @@ def check_child(schoolkid):
     try:
         children = Schoolkid.objects.get(full_name__contains=schoolkid)
     except MultipleObjectsReturned:
-        raise MyAppException('Ошибка: Найдено сразу несколько учеников с '
-                             'введенным именем.')
+        raise DBException('Ошибка: Найдено сразу несколько учеников с '
+                          'введенным именем.')
     except ObjectDoesNotExist:
-        raise MyAppException('Ошибка: Введено несуществующее имя.')
+        raise DBException('Ошибка: Введено несуществующее имя.')
     else:
         return children
 
@@ -28,7 +28,7 @@ def check_lesson(schoolkid, lesson):
     if lesson.title() in lessons_names:
         return lesson.title()
     else:
-        raise MyAppException('Ошибка: Введенный урок не найден.')
+        raise DBException('Ошибка: Введенный урок не найден.')
 
 
 def fix_bad_marks(schoolkid):
@@ -74,7 +74,7 @@ def fix_diary(child_name, lesson_name):
     try:
         schoolkid = check_child(child_name)
         lesson = check_lesson(schoolkid, lesson_name)
-    except MyAppException as error:
+    except DBException as error:
         print(error)
         return
 
