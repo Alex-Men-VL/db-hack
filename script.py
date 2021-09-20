@@ -1,4 +1,5 @@
 import random
+from textwrap import dedent
 
 from datacenter.models import (Chastisement, Commendation, Lesson, Mark,
                                Schoolkid)
@@ -12,13 +13,14 @@ def get_schoolkid_account(schoolkid):
     try:
         child = Schoolkid.objects.get(full_name__contains=schoolkid)
     except Schoolkid.MultipleObjectsReturned:
-        raise BDException('Ошибка: Найдено сразу несколько учеников с '
-                          'введенным именем. \nРешение: Уточните имя ученика, '
-                          'добавив фамилию или отчество.')
+        raise BDException(dedent('''\
+        Ошибка: Найдено сразу несколько учеников с введенным именем.
+        Решение: Уточните имя ученика, добавив фамилию или отчество.'''))
     except Schoolkid.DoesNotExist:
-        raise BDException('Ошибка: Введено несуществующее имя. \nРешение: '
-                          'Проверьте правильность написания имени и порядок. '
-                          'Сначала идет фамилия, потом имя, затем отчество.')
+        raise BDException(dedent('''\
+        Ошибка: Введено несуществующее имя.
+        Решение: Проверьте правильность написания имени и порядок. Сначала \
+идет фамилия, потом имя, затем отчество.'''))
     else:
         return child
 
@@ -28,13 +30,13 @@ def get_schoolkid_lesson(schoolkid, lesson_name):
         year_of_study=schoolkid.year_of_study,
         group_letter=schoolkid.group_letter,
         subject__title=lesson_name
-    ).last
+    )
     if not schoolkid_lesson:
-        raise BDException('Ошибка: Введенный урок не найден. \nРешение: '
-                          'Проверьте правильность написания названия урока. '
-                          'Название должно быть таким, как на сайте '
-                          'электронного дневника.')
-    return schoolkid_lesson
+        raise BDException(dedent('''\
+        Ошибка: Введенный урок не найден.
+        Решение: Проверьте правильность написания названия урока. Название \
+должно быть таким, как на сайте электронного дневника.'''))
+    return schoolkid_lesson.last()
 
 
 def fix_bad_marks(schoolkid):
